@@ -8,6 +8,14 @@ try {
     //
 }
 
+if (! function_exists('config_path')) {
+    function config_path($path = '')
+    {
+        return app()->basePath() . '/config' . ($path ? '/' . $path : $path);
+    }
+}
+
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -28,10 +36,22 @@ $app->withFacades(true, [
     Tymon\JWTAuth\Facades\JWTFactory::class => 'JWTFactory'
 ]);
 
+$app->singleton(Illuminate\Auth\AuthManager::class, function ($app) {
+    return $app->make('auth');
+});
+
+
  $app->withEloquent();
 
  $app->configure('mail');
  $app->configure('services');
+ $app->configure('database');
+ $app->configure('excel');
+ $app->configure('cache');
+
+ 
+
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -52,6 +72,9 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+$app->singleton('filesystem', function ($app) {
+    return $app->loadComponent('filesystems', 'Illuminate\Filesystem\FilesystemServiceProvider', 'filesystem');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -64,14 +87,16 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
+ $app->middleware([
+    App\Http\Middleware\CorsMiddleware::class
+     
+  ]);
 
  $app->routeMiddleware([
      'auth' => App\Http\Middleware\Authenticate::class,
      'role' =>App\Http\Middleware\RoleMiddleware::class,
      'activate' =>App\Http\Middleware\ActivatedMiddleware::class,
+
 
  ]);
 
@@ -87,14 +112,21 @@ $app->singleton(
 */
 
  $app->register(App\Providers\AppServiceProvider::class);
+ 
  $app->register(App\Providers\AuthServiceProvider::class);
  $app->register(Illuminate\Mail\MailServiceProvider::class);
  $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+ $app->register(OwenIt\Auditing\AuditingServiceProvider::class);
 
 
  $app->configure('mail');
 
-// $app->register(App\Providers\EventServiceProvider::class);
+ $app->register(App\Providers\EventServiceProvider::class);
+ $app->register(Spatie\Activitylog\ActivitylogServiceProvider::class);
+  $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+  $app->register(Illuminate\Redis\RedisServiceProvider::class);
+
+ $app->configure('activitylog');
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +138,7 @@ $app->singleton(
 | can respond to, as well as the controllers that may handle them.
 |
 */
+
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

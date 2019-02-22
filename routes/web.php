@@ -14,39 +14,39 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-/*
-          User Routes
-*/
-$router->group(['prefix' => 'api/users'], function () use ($router) {
+
     $router->post('/register','UserController@register');
-
-    $router->get('/getSpacificUser/{id}','UserController@getSpacificUser');
-    
-    
-    
-    $router->get('/activation/{api_token}',['as'=>'activation','uses'=>'UserController@activation']);
+    $router->get('/activation/{api_token}',['as'=>'activation','uses'=>'UserController@verification']);
     $router->post('/login', 'UserController@postLogin');
+    $router->group(['middleware' => ['auth:api','activate']],function($api) use($router){
+         $router->post('/products/sort','ProductController@sort');    
+            $router->post('/products/filter','ProductController@filter');  
+            $router->post('/orders/addorder','OrderController@addOrder');
+  $router->group(['middleware' => ['role']],function($api) use($router){
+ 
+            $router->get('/orders/getorders','OrderController@getOrders');
+
+            $router->post('/orders/addpromocode','CouponController@addPromoCode');    
+            $router->post('/products/addrating/{id}','RatingController@addRating');    
+             
+             $router->post('/products/addproduct','ProductController@addProduct');
+              $router->post('/products/addcriteria','CriteriaController@addCriteria');
+             $router->post('/products/addcriteriaoption','CriteriaoptionController@addCriteriaOption');
+             $router->post('/products/addcategory','CategoryController@addCategory');
+             $router->post('/products/addsubcategory','SubcategoryController@addSubCategory');
+             $router->get('/products/getproducts','ProductController@getProducts');
+              $router->post('/orders/showsoldproducts','OrderController@showSoldProducts');
+
+            
+
+
+  });
+
+           
+
+
+
+     
+    }); 
+
     
-    
-    $router->group(['middleware' => ['auth:api','role','activate']],function($api) use($router){
-    $router->put('/update/{id}','UserController@update');
-   
-    
-    });
-    $router->get('/usersOrders','UserController@usersOrders');
-    $router->delete('/delete/{id}','UserController@delete');
-});
- $router->get('/ordersProducts/{id}','OrderController@OrdersProducts');
-
-
-
-/*
-         Order And Product Routes
-*/
-$router->group(['middleware' => ['auth:api','role','activate']],function($api) use($router){
-    $router->post('/addProduct','ProductController@addProduct');
-     //$router->get('/ordersProducts/{id}','OrderController@OrdersProducts');
-});
-
-//$router->get('/allorders/{id}','OrderController@getAllOrders');
-

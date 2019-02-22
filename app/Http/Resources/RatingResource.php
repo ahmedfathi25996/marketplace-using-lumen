@@ -3,11 +3,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\Resource;
-use App\Http\Resources\ProductResource;
 use Illuminate\Contracts\Encryption\DecryptException;
-use App\Http\Resources\OrderResource;
 
-class UserResource extends Resource
+class RatingResource extends Resource
 {
     /**
      * Transform the resource into an array.
@@ -17,16 +15,12 @@ class UserResource extends Resource
      */
     public function toArray($request)
     {
+        
         return [
-
-            
-            "username"=> $this->username,
-             "email"=>$this->email,
-             "activated"=>$this->activated,
-             "role"=>$this->role,
-             
-             
-             "orders"=> url('ordersProducts',$this->id)
+           "rating_id"=>$this->id,
+             "user_id"=>$this->user_id,
+             "product_id"=>$this->product_id,
+             "rating"=>$this->rating,
              
             
         ];

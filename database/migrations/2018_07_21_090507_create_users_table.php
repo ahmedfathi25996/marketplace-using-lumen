@@ -20,7 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('api_token');
             $table->boolean('activated')->default(0);
-            $table->boolean('role')->default(0);
+            $table->enum('role',['customer','admin'])->default('customer');
+    
             $table->timestamps();
         });
     }

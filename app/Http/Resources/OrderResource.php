@@ -3,10 +3,10 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\Resource;
-use App\Http\Resources\ProductResource;
 use Illuminate\Contracts\Encryption\DecryptException;
-
-
+use App\Http\Resources\ProductResource;
+use Illuminate\Support\Facades\DB;
+use App\Coupon;
 class OrderResource extends Resource
 {
     /**
@@ -17,17 +17,14 @@ class OrderResource extends Resource
      */
     public function toArray($request)
     {
+        
         return [
-
-            
-            "order_id"=>$this->id,
+           "order_id"=>$this->id,
              "user_id"=>$this->user_id,
-             "total"=>$this->total,
-             "created_at"=>$this->created_at,
+             "total"=>$this->products()->sum(DB::raw('qty * price')),
+             
+
              "products"=>ProductResource::collection($this->products)
-             
-             
-             
             
         ];
     }

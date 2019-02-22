@@ -36,13 +36,13 @@ class RoleMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if(Auth::user()->role !=1)
+        if(Auth::user()->role !='admin')
         {
-            return response()->json(['errors' => 'you must be an admin to access this endpoint']);
+            return response()->json(['message' => 'you are not allow to use this endpoints']);
         }
 
         return $next($request);
-    }
 
     
+}
 }

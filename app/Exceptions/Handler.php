@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Handler extends ExceptionHandler
@@ -23,6 +24,7 @@ class Handler extends ExceptionHandler
         HttpException::class,
         ModelNotFoundException::class,
         ValidationException::class,
+        ErrorException::class,
     ];
 
     /**
@@ -35,6 +37,8 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $e)
     {
+        //throw $e;
+        
         parent::report($e);
     }
 
@@ -47,17 +51,23 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        // if($e instanceof FatalThrowableError){
-        //     return response()->json([
-        //       'error'=>  'undefined function'
+        //   if($e instanceof FatalThrowableError){
+        //       return response()->json([
+        //         'error'=>  'undefined function'
             
-        //     ]);
-        // }
+        //       ]);
+        //   }
          if($e instanceof NotFoundHttpException){
              return response()->json([
                'error'=>  'Incorrect Route'
             
              ],404);
+         }
+         if($e instanceof ErrorException){
+            return response()->json([
+                'error'=>  'Trying to get property of non object'
+             
+              ],404);
          }
 
         if($e instanceof Swift_TransportException){
